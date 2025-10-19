@@ -1,7 +1,11 @@
 [package]
 name = "tuitui"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+description = "Build terminal interfaces faster. A batteries-included TUI framework for Rust with low boilerplate and a rich component ecosystem."
+authors = ["tayenx3 kontajiousgd00@gmail.com"]
+license = "MIT"
+readme = "README.md"
 
 [lib]
 

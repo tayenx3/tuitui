@@ -1,5 +1,4 @@
 use std::collections::VecDeque;
-
 use tuitui::prelude::*;
 
 struct NewKeyLoggerApp {
