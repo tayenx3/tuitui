@@ -15,50 +15,54 @@ pub struct Ui {
 }
 
 impl Ui {
+    #[inline]
     pub fn new() -> Self {
         Self { components: Vec::new() }
     }
     
-    pub fn heading(&mut self, heading: &str) -> &mut Self {
-        self.components.push(Box::new(Heading::new(heading)));
+    #[inline]
+    pub fn text(&mut self, content: Text) -> &mut Self {
+        self.components.push(Box::new(content));
+        self
+    }
+    
+    #[inline]
+    pub fn separator(&mut self, pattern: Text, repeat: usize) -> &mut Self {
+        let text: Text = pattern.into();
+        self.components.push(Box::new(Separator::new(text, repeat)));
+        self
+    }
+    
+    #[inline]
+    pub fn paragraph(&mut self, content: Text) -> &mut Self {
+        self.text(content)
+    }
+    
+    #[inline]
+    pub fn heading(&mut self, content: Text) -> &mut Self {
+        let mut text: Text = content.into();
+        text.bold_all();
+        self.components.push(Box::new(text));
         self
     }
 
-    pub fn paragraph(&mut self, paragraph: &str) -> &mut Self {
-        self.components.push(Box::new(Paragraph::new(paragraph)));
+    #[inline]
+    pub fn widget<F>(&mut self, build: F) -> &mut Self
+    where
+        F: FnOnce(WidgetBuilder) -> Widget
+    {
+        let builder = Widget::new();
+        self.components.push(Box::new(build(builder)));
         self
     }
 
-    pub fn separator(&mut self, separator: &str, repeat: usize) -> &mut Self {
-        self.components.push(Box::new(Separator::new(separator, repeat)));
-        self
-    }
-
-    pub fn widget(&mut self, contents: Option<&str>, widget_style: WidgetStyle) -> &mut Self {
-        self.components.push(
-            Box::new(
-                if let Some(contents) = contents {
-                    Widget::new()
-                        .with_style(widget_style)
-                        .with_height(17)
-                        .with_contents(contents)
-                        .build()
-                } else {
-                    Widget::new()
-                        .with_style(widget_style)
-                        .with_height(17)
-                        .build()
-                }
-            )
-        );
-        self
-    }
-
+    #[inline]
     pub fn ascii_art(&mut self, text: &str) -> &mut Self {
         self.components.push(Box::new(AsciiArt::new(text)));
         self
     }
 
+    #[inline]
     pub fn render(&self) -> String {
         let mut buffer = String::new();
         
@@ -70,6 +74,7 @@ impl Ui {
         buffer
     }
     
+    #[inline]
     pub fn clear(&mut self) {
         self.components.clear();
     }

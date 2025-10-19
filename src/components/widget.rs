@@ -1,120 +1,27 @@
-use crossterm::style::{style, Stylize};
-use figlet_rs::FIGfont;
-
-/// * Defines the way an object is rendered
-/// 
-/// You can easily `impl` this with your structs:
-/// ```no_run
-/// struct MyComponent;
-/// 
-/// impl Component for MyComponent {
-///     fn render(&self) -> String {
-///         "This is a very cool component".to_string()
-///     }
-/// }
-/// ```
-pub trait Component {
-    fn render(&self) -> String;
-}
-
-/// * Heading text - just bold text
-/// 
-/// ```no_run
-/// ui.heading("Hello, Tuitui! 🐧")
-/// ```
-pub struct Heading {
-    text: String
-}
-
-impl Heading {
-    pub fn new(text: &str) -> Self {
-        Self {
-            text: text.to_string()
-        }
-    }
-}
-
-
-impl Component for Heading {
-    fn render(&self) -> String {
-        style(self.text.clone()).bold().to_string()
-    }
-}
-
-/// * Paragraph text - normal, non-bold, non-italic text
-/// 
-/// ```no_run
-/// ui.paragraph("This is normal text!")
-/// ```
-pub struct Paragraph {
-    text: String
-}
-
-impl Paragraph {
-    pub fn new(text: &str) -> Self {
-        Self {
-            text: text.to_string()
-        }
-    }
-}
-
-impl Component for Paragraph {
-    fn render(&self) -> String {
-        self.text.clone()
-    }
-}
-
-/// * Separator - a horizontal seperator that repeats the string it was handed
-/// 
-/// ```no_run
-/// ui.separator("*+", 10)
-/// ```
-/// 
-/// Output:
-/// ```plain_text
-/// *+*+*+*+*+*+*+*+*+*+
-/// ```
-pub struct Separator {
-    text: String,
-    repeat: usize
-}
-
-impl Separator {
-    pub fn new(text: &str, repeat: usize) -> Self {
-        Self {
-            text: text.to_string(),
-            repeat
-        }
-    }
-}
-
-impl Component for Separator {
-    fn render(&self) -> String {
-        self.text.repeat(self.repeat)
-    }
-}
+use super::Component;
+use super::Text;
+use strip_ansi_escapes::strip;
 
 #[derive(Debug, Clone)]
 pub struct Widget {
     pub style: WidgetStyle,
     pub width: u16,
     pub height: u16,
-    pub contents: Option<String>
+    pub contents: Text
 }
 
 impl Component for Widget {
+    #[inline]
     fn render(&self) -> String {
-        let lines = if let Some(s) = &self.contents {
-            Some(s.lines().collect::<Vec<_>>())
-        } else {
-            None
-        };
+        let binding = self.contents.render();
+        let lines = binding.lines().collect::<Vec<_>>();
 
-        let width = if let Some(ref lines) = lines {
-            lines.iter().max_by_key(|c| c.len()).unwrap().len().min(self.width.into())
-        } else {
-            self.width.into()
-        };
+        let width = lines
+            .iter()
+            .max_by_key(|c| strip(c).len())
+            .unwrap()
+            .len()
+            .min(self.width.into());
 
         let mut buffer = String::new();
         buffer.push(self.style.top_left);
@@ -127,21 +34,22 @@ impl Component for Widget {
         for l in 0..(self.height - 2) {
             buffer.push(self.style.left_vertical);
             for i in 0..width {
-                if let Some(ref lines) = lines {
-                    let binding = lines
-                        .get(l as usize)
-                        .unwrap_or(&" ")
-                        .chars()
-                        .collect::<Vec<_>>()
-                    ;
-                    let line = binding
-                        .get(i as usize)
-                        .unwrap_or(&' ')
-                    ;
-                    buffer.push(*line)
-                } else {
-                    buffer.push(' ');
-                }
+                let binding = lines
+                    .get(l as usize)
+                    .unwrap_or(&" ")
+                ;
+                let binding = 
+                    String::from_utf8(
+                        strip(binding)
+                    )
+                    .unwrap()
+                    .chars()
+                    .collect::<Vec<_>>();
+                let c = binding
+                    .get(i as usize)
+                    .unwrap_or(&' ')
+                ;
+                buffer.push(*c)
             }
             buffer.push(self.style.right_vertical);
             buffer.push('\n');
@@ -158,6 +66,7 @@ impl Component for Widget {
 }
 
 impl Widget {
+    #[inline]
     pub fn new() -> WidgetBuilder {
         WidgetBuilder::new()
     }
@@ -165,7 +74,6 @@ impl Widget {
 
 #[derive(Debug, Clone)]
 pub struct WidgetStyle {
-    // Borders
     pub top_left: char,
     pub top_right: char, 
     pub bottom_left: char,
@@ -174,11 +82,10 @@ pub struct WidgetStyle {
     pub left_vertical: char,
     pub bottom_horizontal: char,
     pub right_vertical: char,
-
-    // Later... colors?
 }
 
 impl WidgetStyle {
+    #[inline]
     pub fn tuitui_classic() -> Self {
         Self {
             top_left: '┌',
@@ -192,6 +99,7 @@ impl WidgetStyle {
         }
     }
 
+    #[inline]
     pub fn tuitui_heavy_box() -> Self {
         Self {
             top_left: '┏',
@@ -204,6 +112,7 @@ impl WidgetStyle {
             right_vertical: '┃',
         }
     }
+    #[inline]
     pub fn tuitui_rounded() -> Self {
         Self {
             top_left: '╭', top_right: '╮',
@@ -213,6 +122,7 @@ impl WidgetStyle {
         }
     }
     
+    #[inline]
     pub fn tuitui_double() -> Self {
         Self {
             top_left: '╔', top_right: '╗',
@@ -222,6 +132,7 @@ impl WidgetStyle {
         }
     }
     
+    #[inline]
     pub fn tuitui_ascii() -> Self {
         Self {
             top_left: '+', top_right: '+',
@@ -231,6 +142,7 @@ impl WidgetStyle {
         }
     }
 
+    #[inline]
     pub fn custom(
         top_left: char,
         top_right: char, 
@@ -246,6 +158,7 @@ impl WidgetStyle {
         }
     }
     
+    #[inline]
     pub fn retro_ibm() -> Self {
         Self {
             top_left: '▄', top_right: '▄',
@@ -255,6 +168,7 @@ impl WidgetStyle {
         }
     }
     
+    #[inline]
     pub fn retro_apple2() -> Self {
         Self {
             top_left: '█', top_right: '█',
@@ -264,6 +178,7 @@ impl WidgetStyle {
         }
     }
     
+    #[inline]
     pub fn retro_c64() -> Self {
         Self {
             top_left: '▛', top_right: '▜',
@@ -273,6 +188,7 @@ impl WidgetStyle {
         }
     }
 
+    #[inline]
     pub fn no_border() -> Self {
         Self {
             top_left: ' ', top_right: ' ',
@@ -282,6 +198,7 @@ impl WidgetStyle {
         }
     }
 
+    #[inline]
     pub fn dotted() -> Self {
         Self {
             top_left: '┌',
@@ -295,6 +212,7 @@ impl WidgetStyle {
         }
     }
 
+    #[inline]
     pub fn dashed() -> Self {
         Self {
             top_left: '┌',
@@ -308,6 +226,7 @@ impl WidgetStyle {
         }
     }
 
+    #[inline]
     pub fn from_name(name: &str) -> Self {
         let n = name.to_lowercase();
         match n.strip_prefix("tuitui ").unwrap_or(&n) {
@@ -327,71 +246,60 @@ impl WidgetStyle {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct WidgetBuilder {
     widget: Widget
 }
 
 impl WidgetBuilder {
+    #[inline]
     fn new() -> Self {
         Self {
             widget: Widget {
                 style: WidgetStyle::from_name("Tuitui Classic"),
                 width: 10,
                 height: 10,
-                contents: None
+                contents: Text {
+                    spans: Vec::new()
+                }
             }
         }
     }
 
+    #[inline]
     pub fn with_width(mut self, w: u16) -> Self {
         self.widget.width = w.max(2); self
     }
 
+    #[inline]
     pub fn with_height(mut self, h: u16) -> Self {
         self.widget.height = h.max(2); self
     }
 
+    #[inline]
     pub fn with_style(mut self, style: WidgetStyle) -> Self {
         self.widget.style = style; self
     }
 
-    pub fn with_contents(mut self, contents: &str) -> Self {
-        self.widget.contents = Some(contents.to_string());
+    #[inline]
+    pub fn with_contents(mut self, contents: Text) -> Self {
+        self.widget.contents = contents.clone();
 
-        let lines = contents.lines().collect::<Vec<_>>();
+        let binding = contents.render();
+        let lines = binding.lines().collect::<Vec<_>>();
         let largest = lines.iter().max_by_key(|s| s.len()).unwrap_or(&"").len();
         if largest > self.widget.width as usize - 2 {
-            self.widget.width = contents.len() as u16 + 2;
+            self.widget.width = contents.render().len() as u16 + 2;
         }
 
         if lines.len() > self.widget.height as usize - 2 {
-            self.widget.width = contents.len() as u16 + 2;
+            self.widget.width = contents.render().len() as u16 + 2;
         }
         self
     }
 
+    #[inline]
     pub fn build(self) -> Widget {
         self.widget
     }
 }
-
-pub struct AsciiArt {
-    text: String
-}
-
-impl AsciiArt {
-    pub fn new(text: &str) -> Self {
-        Self {
-            text: text.to_string()
-        }
-    }
-}
-
-impl Component for AsciiArt {
-    fn render(&self) -> String {
-        let standard_font = FIGfont::standard().unwrap();
-        let figure = standard_font.convert(&self.text);
-        figure.unwrap().to_string()
-    }
-}
-
