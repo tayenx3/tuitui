@@ -44,7 +44,7 @@ impl AppRuntime {
         self
     }
     
-    #[inline]
+    
     pub fn run<A: App>(mut self, mut app: A) -> Result<(), Box<dyn std::error::Error>> {
         let mut ui = Ui::new();
         let mut last_frame = String::new();
@@ -74,7 +74,7 @@ impl AppRuntime {
     }
 }
 
-#[inline]
+
 fn clear_screen() {
     print!("\x1b[2J\x1b[3J\x1b[1;1H"); 
 }

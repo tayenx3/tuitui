@@ -15,30 +15,30 @@ pub struct Ui {
 }
 
 impl Ui {
-    #[inline]
+    
     pub fn new() -> Self {
         Self { components: Vec::new() }
     }
     
-    #[inline]
+    
     pub fn text(&mut self, content: Text) -> &mut Self {
         self.components.push(Box::new(content));
         self
     }
     
-    #[inline]
+    
     pub fn separator(&mut self, pattern: Text, repeat: usize) -> &mut Self {
         let text: Text = pattern.into();
         self.components.push(Box::new(Separator::new(text, repeat)));
         self
     }
     
-    #[inline]
+    
     pub fn paragraph(&mut self, content: Text) -> &mut Self {
         self.text(content)
     }
     
-    #[inline]
+    
     pub fn heading(&mut self, content: Text) -> &mut Self {
         let mut text: Text = content.into();
         text.bold_all();
@@ -46,7 +46,7 @@ impl Ui {
         self
     }
 
-    #[inline]
+    
     pub fn widget<F>(&mut self, build: F) -> &mut Self
     where
         F: FnOnce(WidgetBuilder) -> Widget
@@ -56,13 +56,13 @@ impl Ui {
         self
     }
 
-    #[inline]
+    
     pub fn ascii_art(&mut self, text: &str) -> &mut Self {
         self.components.push(Box::new(AsciiArt::new(text)));
         self
     }
 
-    #[inline]
+    
     pub fn render(&self) -> String {
         let mut buffer = String::new();
         
@@ -74,7 +74,7 @@ impl Ui {
         buffer
     }
     
-    #[inline]
+    
     pub fn clear(&mut self) {
         self.components.clear();
     }

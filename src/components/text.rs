@@ -23,7 +23,7 @@ pub enum Color {
 }
 
 impl Color {
-    #[inline]
+    
     pub fn ansi_fg(&self) -> String {
         match self {
             Color::Black => "\x1b[30m".to_string(),
@@ -47,7 +47,7 @@ impl Color {
         }
     }
     
-    #[inline]
+    
     pub fn ansi_bg(&self) -> String {
         match self {
             Color::Black => "\x1b[40m".to_string(),
@@ -85,7 +85,7 @@ pub enum Style {
 }
 
 impl Style {
-    #[inline]
+    
     pub fn ansi(&self) -> String {
         match self {
             Style::Bold => "\x1b[1m",
@@ -106,83 +106,94 @@ pub struct Text {
 }
 
 impl Text {
-    #[inline]
+    
     pub fn new() -> Self {
         Self {
             spans: Vec::new()
         }
     }
 
-    #[inline]
+    
     pub fn span(&mut self, content: &str) -> &mut TextSpan {
         self.spans.push(TextSpan::new(content));
         self.spans.last_mut().unwrap()
     }
 
-    #[inline]
+    
     pub fn span_from(&mut self, span: TextSpan) {
         self.spans.push(span)
     }
 
-    #[inline]
+    
     pub fn bold_all(&mut self) {
         self.spans.iter_mut().for_each(|s| {
             s.bold();
         })
     }
 
-    #[inline]
+    
     pub fn dim_all(&mut self) {
         self.spans.iter_mut().for_each(|s| {
             s.dim();
         })
     }
 
-    #[inline]
+    
     pub fn italic_all(&mut self) {
         self.spans.iter_mut().for_each(|s| {
             s.italic();
         })
     }
 
-    #[inline]
+    
     pub fn underline_all(&mut self) {
         self.spans.iter_mut().for_each(|s| {
             s.underlined();
         })
     }
 
-    #[inline]
+    
     pub fn blink_all(&mut self) {
         self.spans.iter_mut().for_each(|s| {
             s.blink();
         })
     }
 
-    #[inline]
+    
     pub fn reverse_video_all(&mut self) {
         self.spans.iter_mut().for_each(|s| {
             s.reverse_video();
         })
     }
 
-    #[inline]
+    
     pub fn conceal_all(&mut self) {
         self.spans.iter_mut().for_each(|s| {
             s.concealed();
         })
     }
 
-    #[inline]
+    
     pub fn strikethrough_all(&mut self) {
         self.spans.iter_mut().for_each(|s| {
             s.strikethrough();
         })
     }
+
+    
+    pub fn render_plain(&self) -> String {
+        let mut output = String::new();
+
+        for span in &self.spans {
+            output.push_str(&span.render_plain())
+        }
+
+        output
+    }
 }
 
 impl Component for Text {
-    #[inline]
+    
     fn render(&self) -> String {
         let mut output = String::new();
 
@@ -203,7 +214,7 @@ pub struct TextSpan {
 }
 
 impl TextSpan {
-    #[inline]
+    
     pub fn new(content: &str) -> Self {
         Self {
             content: content.to_string(),
@@ -213,68 +224,72 @@ impl TextSpan {
         }
     }
 
-    #[inline]
+    
     pub fn contents(&mut self, contents: &str) -> &mut Self {
         self.content = contents.to_string();
         self
     }
 
-    #[inline]
+    
     pub fn color(&mut self, color: Color) -> &mut Self {
         self.color = Some(color);
         self
     }
     
-    #[inline]
+    
     pub fn bg_color(&mut self, color: Color) -> &mut Self {
         self.bg_color = Some(color);
         self
     }
 
-    #[inline]
+    
     pub fn bold(&mut self) -> &mut Self {
         self.styles.push(Style::Bold);
         self
     }
-    #[inline]
+    
     pub fn dim(&mut self) -> &mut Self {
         self.styles.push(Style::Dim);
         self
     }
-    #[inline]
+    
     pub fn italic(&mut self) -> &mut Self {
         self.styles.push(Style::Italic);
         self
     }
-    #[inline]
+    
     pub fn underlined(&mut self) -> &mut Self {
         self.styles.push(Style::Underlined);
         self
     }
-    #[inline]
+    
     pub fn blink(&mut self) -> &mut Self {
         self.styles.push(Style::Blink);
         self
     }
-    #[inline]
+    
     pub fn reverse_video(&mut self) -> &mut Self {
         self.styles.push(Style::ReverseVideo);
         self
     }
-    #[inline]
+    
     pub fn concealed(&mut self) -> &mut Self {
         self.styles.push(Style::Concealed);
         self
     }
-    #[inline]
+    
     pub fn strikethrough(&mut self) -> &mut Self {
         self.styles.push(Style::Strikethrough);
         self
     }
+
+    pub fn render_plain(&self) -> String {
+        self.content.clone()
+    }
 }
 
 impl Component for TextSpan {
-    #[inline]
+    
     fn render(&self) -> String {
         let mut output = String::new();
         
@@ -295,7 +310,7 @@ impl Component for TextSpan {
 }
 
 impl From<&str> for Text {
-    #[inline]
+    
     fn from(s: &str) -> Self {
         let mut text = Text::new();
         text.span(s);
@@ -304,7 +319,7 @@ impl From<&str> for Text {
 }
 
 impl From<String> for Text {
-    #[inline]
+    
     fn from(s: String) -> Self {
         let mut text = Text::new();
         text.span(&s);
@@ -313,7 +328,7 @@ impl From<String> for Text {
 }
 
 impl From<TextSpan> for Text {
-    #[inline]
+    
     fn from(span: TextSpan) -> Self {
         let mut text = Text::new();
         text.span_from(span);

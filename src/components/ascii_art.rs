@@ -6,7 +6,7 @@ pub struct AsciiArt {
 }
 
 impl AsciiArt {
-    #[inline]
+    
     pub fn new(text: &str) -> Self {
         Self {
             text: text.to_string()
@@ -15,7 +15,7 @@ impl AsciiArt {
 }
 
 impl Component for AsciiArt {
-    #[inline]
+    
     fn render(&self) -> String {
         let standard_font = FIGfont::standard().unwrap();
         let figure = standard_font.convert(&self.text);

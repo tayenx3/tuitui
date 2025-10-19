@@ -64,29 +64,29 @@ pub enum InputKey {
 }
 
 impl InputKey {
-    #[inline]
+    
     pub fn to_debug_string(&self) -> String {
         self.as_ref().to_string()
     }
 
-    #[inline]
+    
     pub fn to_friendly_string(&self) -> String {
         self.to_debug_string().to_case(Case::Title)
     }
 
-    #[inline]
+    
     pub fn is_typeable_key(&self) -> bool {
         TYPEABLE_KEYS.contains(self)
     }
 
-    #[inline]
+    
     pub fn is_action_key(&self) -> bool {
         ACTION_KEYS.contains(self)
     }
 }
 
 impl TryFrom<KeyEvent> for InputKey {
-    #[inline]
+    
     fn try_from(event: KeyEvent) -> Result<Self, Self::Error> {
         let code = event.code;
         match code {
@@ -215,22 +215,22 @@ pub struct Key {
 }
 
 impl Key {
-    #[inline]
+    
     pub fn ctrl(&self) -> bool {
         self.modifiers.contains(KeyModifiers::CONTROL)
     }
     
-    #[inline]
+    
     pub fn alt(&self) -> bool {
         self.modifiers.contains(KeyModifiers::ALT)
     }
     
-    #[inline]
+    
     pub fn shift(&self) -> bool {
         self.modifiers.contains(KeyModifiers::SHIFT)
     }
 
-    #[inline]
+    
     pub fn to_friendly_string(&self) -> String {
         let mut output = String::new();
         output.push_str(&format!("{} {}", self.key.to_friendly_string(), if let Some(ch) = self.character { format!("( {} )", ch)} else { "".to_string() }));
@@ -245,7 +245,7 @@ impl InputHandler {
         Self
     }
     
-    #[inline]
+    
     pub fn poll(&mut self, timeout: Duration) -> Option<Key> {
         if event::poll(timeout).ok()? {
             if let Ok(crossterm_event) = event::read() {

@@ -17,7 +17,7 @@ pub struct Separator {
 }
 
 impl Separator {
-    #[inline]
+    
     pub fn new(text: Text, repeat: usize) -> Self {
         Self {
             text: text,
@@ -27,7 +27,7 @@ impl Separator {
 }
 
 impl Component for Separator {
-    #[inline]
+    
     fn render(&self) -> String {
         self.text.render().repeat(self.repeat)
     }

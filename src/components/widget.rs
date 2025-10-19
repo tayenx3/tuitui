@@ -1,6 +1,5 @@
 use super::Component;
 use super::Text;
-use strip_ansi_escapes::strip;
 
 #[derive(Debug, Clone)]
 pub struct Widget {
@@ -11,14 +10,14 @@ pub struct Widget {
 }
 
 impl Component for Widget {
-    #[inline]
+    
     fn render(&self) -> String {
-        let binding = self.contents.render();
+        let binding = self.contents.render_plain();
         let lines = binding.lines().collect::<Vec<_>>();
 
         let width = lines
             .iter()
-            .max_by_key(|c| strip(c).len())
+            .max_by_key(|c| c.len())
             .unwrap()
             .len()
             .min(self.width.into());
@@ -39,10 +38,7 @@ impl Component for Widget {
                     .unwrap_or(&" ")
                 ;
                 let binding = 
-                    String::from_utf8(
-                        strip(binding)
-                    )
-                    .unwrap()
+                    binding
                     .chars()
                     .collect::<Vec<_>>();
                 let c = binding
@@ -66,7 +62,7 @@ impl Component for Widget {
 }
 
 impl Widget {
-    #[inline]
+    
     pub fn new() -> WidgetBuilder {
         WidgetBuilder::new()
     }
@@ -85,7 +81,7 @@ pub struct WidgetStyle {
 }
 
 impl WidgetStyle {
-    #[inline]
+    
     pub fn tuitui_classic() -> Self {
         Self {
             top_left: '┌',
@@ -99,7 +95,7 @@ impl WidgetStyle {
         }
     }
 
-    #[inline]
+    
     pub fn tuitui_heavy_box() -> Self {
         Self {
             top_left: '┏',
@@ -112,7 +108,7 @@ impl WidgetStyle {
             right_vertical: '┃',
         }
     }
-    #[inline]
+    
     pub fn tuitui_rounded() -> Self {
         Self {
             top_left: '╭', top_right: '╮',
@@ -122,7 +118,7 @@ impl WidgetStyle {
         }
     }
     
-    #[inline]
+    
     pub fn tuitui_double() -> Self {
         Self {
             top_left: '╔', top_right: '╗',
@@ -132,7 +128,7 @@ impl WidgetStyle {
         }
     }
     
-    #[inline]
+    
     pub fn tuitui_ascii() -> Self {
         Self {
             top_left: '+', top_right: '+',
@@ -142,7 +138,7 @@ impl WidgetStyle {
         }
     }
 
-    #[inline]
+    
     pub fn custom(
         top_left: char,
         top_right: char, 
@@ -158,7 +154,7 @@ impl WidgetStyle {
         }
     }
     
-    #[inline]
+    
     pub fn retro_ibm() -> Self {
         Self {
             top_left: '▄', top_right: '▄',
@@ -168,7 +164,7 @@ impl WidgetStyle {
         }
     }
     
-    #[inline]
+    
     pub fn retro_apple2() -> Self {
         Self {
             top_left: '█', top_right: '█',
@@ -178,7 +174,7 @@ impl WidgetStyle {
         }
     }
     
-    #[inline]
+    
     pub fn retro_c64() -> Self {
         Self {
             top_left: '▛', top_right: '▜',
@@ -188,7 +184,7 @@ impl WidgetStyle {
         }
     }
 
-    #[inline]
+    
     pub fn no_border() -> Self {
         Self {
             top_left: ' ', top_right: ' ',
@@ -198,7 +194,7 @@ impl WidgetStyle {
         }
     }
 
-    #[inline]
+    
     pub fn dotted() -> Self {
         Self {
             top_left: '┌',
@@ -212,7 +208,7 @@ impl WidgetStyle {
         }
     }
 
-    #[inline]
+    
     pub fn dashed() -> Self {
         Self {
             top_left: '┌',
@@ -226,7 +222,7 @@ impl WidgetStyle {
         }
     }
 
-    #[inline]
+    
     pub fn from_name(name: &str) -> Self {
         let n = name.to_lowercase();
         match n.strip_prefix("tuitui ").unwrap_or(&n) {
@@ -252,7 +248,7 @@ pub struct WidgetBuilder {
 }
 
 impl WidgetBuilder {
-    #[inline]
+    
     fn new() -> Self {
         Self {
             widget: Widget {
@@ -266,22 +262,22 @@ impl WidgetBuilder {
         }
     }
 
-    #[inline]
+    
     pub fn with_width(mut self, w: u16) -> Self {
         self.widget.width = w.max(2); self
     }
 
-    #[inline]
+    
     pub fn with_height(mut self, h: u16) -> Self {
         self.widget.height = h.max(2); self
     }
 
-    #[inline]
+    
     pub fn with_style(mut self, style: WidgetStyle) -> Self {
         self.widget.style = style; self
     }
 
-    #[inline]
+    
     pub fn with_contents(mut self, contents: Text) -> Self {
         self.widget.contents = contents.clone();
 
@@ -298,7 +294,7 @@ impl WidgetBuilder {
         self
     }
 
-    #[inline]
+    
     pub fn build(self) -> Widget {
         self.widget
     }
