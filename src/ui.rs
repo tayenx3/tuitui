@@ -1,5 +1,15 @@
 use crate::components::*;
 
+/// * Builds your user interface with a fluent API.
+///
+/// Add components in the order they should appear:
+/// ```no_run
+/// let mut ui = Ui::new();
+/// ui
+///  .heading("Welcome")
+///  .paragraph("This is my app")
+///  .widget(some_component);
+/// ```
 pub struct Ui {
     pub(crate) components: Vec<Box<dyn Component>>
 }
@@ -19,19 +29,26 @@ impl Ui {
         self
     }
 
-    pub fn separator(&mut self, separator: &str) -> &mut Self {
-        self.components.push(Box::new(Separator::new(separator)));
+    pub fn separator(&mut self, separator: &str, repeat: usize) -> &mut Self {
+        self.components.push(Box::new(Separator::new(separator, repeat)));
         self
     }
 
-    pub fn widget(&mut self, contents: &str) -> &mut Self {
+    pub fn widget(&mut self, contents: Option<&str>, widget_style: WidgetStyle) -> &mut Self {
         self.components.push(
             Box::new(
-                Widget::new()
-                    .with_style(WidgetStyle::from_name("Tuitui Rounded"))
-                    .with_height(17)
-                    .with_contents(contents)
-                    .build()
+                if let Some(contents) = contents {
+                    Widget::new()
+                        .with_style(widget_style)
+                        .with_height(17)
+                        .with_contents(contents)
+                        .build()
+                } else {
+                    Widget::new()
+                        .with_style(widget_style)
+                        .with_height(17)
+                        .build()
+                }
             )
         );
         self

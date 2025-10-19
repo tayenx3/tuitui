@@ -1,6 +1,27 @@
 use std::io::{self, Write};
 use crate::{inputs::*, ui::Ui};
 
+/// * Defines a TUI application that can handle input and render UI.
+///
+/// Implement this trait to create your application logic:
+/// ```no_run
+/// struct MyApp;
+/// 
+/// impl App for MyApp {
+///     fn display(&mut self, ui: &mut Ui) {
+///         ui.heading("My Cool App");
+///     }
+///     
+///     fn update(&mut self, key: Option<Key>) -> bool {
+///         // Return false to quit the App
+///         key.map(|k| k.key != InputKey::Q).unwrap_or(true)
+///     }
+/// 
+///     fn get_fps(&self) -> u32 {
+///         30
+///     }
+/// }
+/// ```
 pub trait App {
     fn display(&mut self, ui: &mut Ui);
     fn update(&mut self, key: Option<Key>) -> bool;

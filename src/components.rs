@@ -1,10 +1,27 @@
 use crossterm::style::{style, Stylize};
 use figlet_rs::FIGfont;
 
+/// * Defines the way an object is rendered
+/// 
+/// You can easily `impl` this with your structs:
+/// ```no_run
+/// struct MyComponent;
+/// 
+/// impl Component for MyComponent {
+///     fn render(&self) -> String {
+///         "This is a very cool component".to_string()
+///     }
+/// }
+/// ```
 pub trait Component {
     fn render(&self) -> String;
 }
 
+/// * Heading text - just bold text
+/// 
+/// ```no_run
+/// ui.heading("Hello, Tuitui! 🐧")
+/// ```
 pub struct Heading {
     text: String
 }
@@ -24,7 +41,11 @@ impl Component for Heading {
     }
 }
 
-
+/// * Paragraph text - normal, non-bold, non-italic text
+/// 
+/// ```no_run
+/// ui.paragraph("This is normal text!")
+/// ```
 pub struct Paragraph {
     text: String
 }
@@ -43,22 +64,33 @@ impl Component for Paragraph {
     }
 }
 
-
+/// * Separator - a horizontal seperator that repeats the string it was handed
+/// 
+/// ```no_run
+/// ui.separator("*+", 10)
+/// ```
+/// 
+/// Output:
+/// ```plain_text
+/// *+*+*+*+*+*+*+*+*+*+
+/// ```
 pub struct Separator {
-    text: String
+    text: String,
+    repeat: usize
 }
 
 impl Separator {
-    pub fn new(text: &str) -> Self {
+    pub fn new(text: &str, repeat: usize) -> Self {
         Self {
-            text: text.to_string()
+            text: text.to_string(),
+            repeat
         }
     }
 }
 
 impl Component for Separator {
     fn render(&self) -> String {
-        self.text.repeat(10)
+        self.text.repeat(self.repeat)
     }
 }
 
@@ -362,3 +394,4 @@ impl Component for AsciiArt {
         figure.unwrap().to_string()
     }
 }
+

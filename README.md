@@ -5,11 +5,10 @@ with low boilerplate and a rich component ecosystem.
 
 ## Why tuitui?
 
-- **Friendly API** - Gentle learning curve
-- **Low Boilerplate** - Focus on your app, not framework code
-- **Batteries Included** - Forms, tables, lists, and more built-in
-- **Composable** - Easy to build and share custom components
-- **Predictable** - Follows Rust conventions, no hidden magic
+- **Low boilerplate** - Focus on your app, not framework code
+- **Batteries included** - ASCII art, widgets, and more built-in
+- **Fluent API** - Intuitive method chaining
+- **Composable** - Easy to build custom components
 
 ## Quick Start
 
@@ -32,20 +31,22 @@ impl App for NewKeyLoggerApp {
     fn display(&mut self, ui: &mut Ui) {
         ui
             .ascii_art("Tuitui Key Logger")
-            .separator("*=")
+            .separator("*=", 10)
             .paragraph("This a Tuitui Key Logger")
             .paragraph("Press Esc to quit")
-            .widget(&format!("Last 15 Keys:\n{}", 
+            .widget(Some(&format!("Last 15 Keys:\n{}", 
                 self.keys
-                .iter()
-                .map(|k| 
-                    format!(
-                        " - {}", k.to_friendly_string()
+                    .iter()
+                    .map(|k| 
+                        format!(
+                            " - {}", k.to_friendly_string()
+                        )
                     )
-                )
-                .collect::<Vec<_>>()
-                .join("\n")
-            ))
+                    .collect::<Vec<_>>()
+                    .join("\n")
+                )),
+                WidgetStyle::from_name("rounded")
+            )
         ;
     }
     

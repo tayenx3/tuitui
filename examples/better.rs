@@ -16,20 +16,22 @@ impl App for NewKeyLoggerApp {
     fn display(&mut self, ui: &mut Ui) {
         ui
             .ascii_art("Tuitui Key Logger")
-            .separator("*=")
+            .separator("*=", 10)
             .paragraph("This a Tuitui Key Logger")
             .paragraph("Press Esc to quit")
-            .widget(&format!("Last 15 Keys:\n{}", 
+            .widget(Some(&format!("Last 15 Keys:\n{}", 
                 self.keys
-                .iter()
-                .map(|k| 
-                    format!(
-                        " - {}", k.to_friendly_string()
+                    .iter()
+                    .map(|k| 
+                        format!(
+                            " - {}", k.to_friendly_string()
+                        )
                     )
-                )
-                .collect::<Vec<_>>()
-                .join("\n")
-            ))
+                    .collect::<Vec<_>>()
+                    .join("\n")
+                )),
+                WidgetStyle::from_name("rounded")
+            )
         ;
     }
     
