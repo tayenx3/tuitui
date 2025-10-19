@@ -22,7 +22,18 @@ impl App for Mascot {
     }
     
     fn update(&mut self, key: Option<Key>) -> bool {
-        false
+        if let None = key {
+            return true
+        }
+        let key = key.unwrap();
+
+        let mut quit = false;
+
+        match key.key {
+            InputKey::Esc => quit = true,
+            _ => {}
+        }
+        !quit
     }
 
     fn get_fps(&self) -> u32 {
